@@ -23,6 +23,7 @@ def extractobject(txt):
         elif '------' in x:
             objectitem = (objects[objects.index(x)+4])
             objectitems = objectitem.split(":")
+            # the following regex matches on the name of the object.
             objectname1 = re.search(r"(?s)(?<=-------).*?(?=-------)", x)
             objectname = objectname1.group(0)
             objectdict[objectname] = objectitems
@@ -43,7 +44,7 @@ def extractgroupobject(txt):
         for y in objectgroups:
             if '-------' in y and 'Custom' in (objectgroups[objectgroups.index(y)+2]) and (objectgroups[objectgroups.index(y)+4]) != '':
                 i = objectgroups.index(y)+4
-                # print(type(i))
+                # the following regex matches on the name of the object.
                 objectgroupname1 = re.search(
                     r"(?s)(?<=-------).*?(?=-------)", y)
                 objectgroupname = objectgroupname1.group(0)
@@ -74,9 +75,12 @@ def extractserviceobject(txt):
     for z in serviceobjects:
         if '-------' in z and 'Ports:' in (serviceobjects[serviceobjects.index(z)+1]):
             serviceobjectstring = serviceobjects[serviceobjects.index(z)+1]
+            # the following regex matches on the service object ports.
             serviceobjectports1 = re.search(r"Ports:.*$", serviceobjectstring)
+            # the following regex matches on the name of the object.
             serviceobjectname1 = re.search(
                 r"(?s)(?<=-------).*?(?=-------)", z)
+            # the following regex matches on IP type which is based on a number.
             serviceobjecttype1 = re.search(
                 r"(?s)(?<=IpType: ).*?(?=,)", serviceobjectstring)
             serviceobjecttypenumber = serviceobjecttype1.group(0)
@@ -84,6 +88,7 @@ def extractserviceobject(txt):
             serviceobjectname = serviceobjectname1.group(0)
             serviceobject = serviceobjectports.split(":")
             serviceobjectconvert = serviceobject[1].replace("~", "-")
+            # the following if then statement finds the IP type based on the number.
             if serviceobjecttypenumber == '6':
                 serviceobjecttype = 'TCP'
             elif serviceobjecttypenumber == '17':
@@ -94,6 +99,7 @@ def extractserviceobject(txt):
                 serviceobjecttype = 'IPv6-ICMP'
             serviceobjectlist = []
             normalizeserviceobject = serviceobjectconvert.split("-")
+            # If the starting port number and ending port numberare the same, then just use one port number
             if normalizeserviceobject[0].strip() == normalizeserviceobject[1]:
                 serviceobjectconvert = normalizeserviceobject[1]
             serviceobjectlist += [serviceobjecttype]
