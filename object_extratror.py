@@ -54,7 +54,7 @@ def extractgroupobject(txt):
                     objectmember1 = re.search(
                         r"(?s)(?<=Name:).*?(?=Handle:)", objectgroups[i])
                     objectmember = objectmember1.group(0)
-                    objectlist += [objectmember]
+                    objectlist += [objectmember.strip()]
                     i += 1
                     if objectgroups[i] == '':
                         objectgroupdict.update({objectgroupname: objectlist})
@@ -111,6 +111,36 @@ def extractserviceobject(txt):
     print(serviceobjectdict)
 
 
+def extractservicegroup(txt):
+    # The following regex matches the network objects group section of the tsr
+    a = re.search(
+        r"(?s)--Service Group Table--(.*?)--Service Object Table--", txt)
+    servicegroupstring = a.group(0)
+    servicegroups = servicegroupstring.splitlines()
+    servicegroupdict = {}
+    # The following function takes the object groups and puts them into a dictionary called objectgroup dict. The key is the object group name and the values are the group members
+    for a in servicegroups:
+        if '-------' in a and 'member' in (servicegroups[servicegroups.index(a)+3]):
+            i = servicegroups.index(a)+3
+            # the following regex matches on the name of the object.
+            objectgroupname1 = re.search(
+                r"(?s)(?<=-------).*?(?=-------)", a)
+            objectgroupname = objectgroupname1.group(0)
+            objectlist = []
+            # the following appends members of the group to a list that is added as a value to the dictionary.
+            while i > 0:
+                objectmember1 = re.search(
+                    r"(?s)(?<=Name:).*?(?=Handle:)", servicegroups[i])
+                objectmember = objectmember1.group(0)
+                objectlist += [objectmember.strip()]
+                i += 1
+                if servicegroups[i] == '':
+                    servicegroupdict.update({objectgroupname: objectlist})
+                    break
+    print(servicegroupdict)
+
+
 extractobject(txt)
 extractgroupobject(txt)
 extractserviceobject(txt)
+extractservicegroup(txt)
