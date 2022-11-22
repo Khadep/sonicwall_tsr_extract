@@ -30,11 +30,11 @@ def extractobject(txt):
             objectdict['NAME'] = objectname
             objectdict['TYPE'] = objectitems[0]
             objectdict['VALUE'] = objectitems[1].strip()
-            # print(objectdict)
             objectlist.append(objectdict)
         elif 'Network Object Manager' in x:
             break
-    print(objectlist)
+    extractobject.var = objectlist
+    return(objectlist)
 
 
 def extractgroupobject(txt):
@@ -146,6 +146,25 @@ def extractservicegroup(txt):
 
 
 extractobject(txt)
+
+
+def exportobject_tocsv():
+    # Here we are exporting the objects to csv
+    csv_columns = ['NAME', 'DESCRIPTION', 'TYPE', 'VALUE', 'LOOKUP']
+    csv_file = "sonicwallobjects.csv"
+    try:
+        with open(csv_file, 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writeheader()
+            for data in extractobject.var:
+                writer.writerow(data)
+    except IOError:
+        print("I/O error")
+
+
+exportobject_tocsv()
 extractgroupobject(txt)
 extractserviceobject(txt)
 extractservicegroup(txt)
+
+# NAME,PROTOCOL,PORT,ICMPCODE,ICMPTYPE
