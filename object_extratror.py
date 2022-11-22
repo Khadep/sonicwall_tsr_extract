@@ -75,7 +75,8 @@ def extractserviceobject(txt):
         r"(?s)--Service Object Table--(.*)--Route Advertisement--", txt)
     serviceobjectstring = z.group(0)
     serviceobjects = serviceobjectstring.splitlines()
-    serviceobjectdict = {}
+
+    serviceobjectlist = []
     # the following function adds service objects to the service object dictionary. It adds the IP type(tcp vs udp etc) and the port number/range then adds the values to the dictionary with the service object name as the key.
     for z in serviceobjects:
         if '-------' in z and 'Ports:' in (serviceobjects[serviceobjects.index(z)+1]):
@@ -102,18 +103,23 @@ def extractserviceobject(txt):
                 serviceobjecttype = 'ICMP'
             elif serviceobjecttypenumber == '58':
                 serviceobjecttype = 'IPv6-ICMP'
-            serviceobjectlist = []
             normalizeserviceobject = serviceobjectconvert.split("-")
             # If the starting port number and ending port numberare the same, then just use one port number
             if normalizeserviceobject[0].strip() == normalizeserviceobject[1]:
                 serviceobjectconvert = normalizeserviceobject[1]
-            serviceobjectlist += [serviceobjecttype]
-            serviceobjectlist += [serviceobjectconvert.strip()]
-            serviceobjectdict[serviceobjectname] = [serviceobjectlist]
+            #serviceobjectlist += [serviceobjecttype]
+            #serviceobjectlist += [serviceobjectconvert.strip()]
+            #serviceobjectdict[serviceobjectname] = [serviceobjectlist]
+            # NAME,PROTOCOL,PORT,ICMPCODE,ICMPTYPE
+            serviceobjectdict = {}
+            serviceobjectdict['NAME'] = serviceobjectname
+            serviceobjectdict['PROTOCOL'] = serviceobjecttype
+            serviceobjectdict['PORT'] = serviceobjectconvert.strip()
+            serviceobjectlist.append(serviceobjectdict)
         elif '--Route Advertisement--' in z:
             break
-
-    print(serviceobjectdict)
+    extractserviceobject.var = serviceobjectlist
+    return(serviceobjectlist)
 
 
 def extractservicegroup(txt):
@@ -145,11 +151,9 @@ def extractservicegroup(txt):
     print(servicegroupdict)
 
 
-extractobject(txt)
-
-
 def exportobject_tocsv():
     # Here we are exporting the objects to csv
+    extractobject(txt)
     csv_columns = ['NAME', 'DESCRIPTION', 'TYPE', 'VALUE', 'LOOKUP']
     csv_file = "sonicwallobjects.csv"
     try:
@@ -162,9 +166,22 @@ def exportobject_tocsv():
         print("I/O error")
 
 
-exportobject_tocsv()
-extractgroupobject(txt)
-extractserviceobject(txt)
-extractservicegroup(txt)
+def exportservice_object_tocsv():
+    extractserviceobject(txt)
+    # Here we are exporting the objects to csv
+    csv_columns = ['NAME', 'PROTOCOL', 'PORT', 'ICMPCODE', 'ICMPTYPE']
+    csv_file = "sonicwallserviceobjects.csv"
+    try:
+        with open(csv_file, 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writeheader()
+            for data in extractserviceobject.var:
+                writer.writerow(data)
+    except IOError:
+        print("I/O error")
 
-# NAME,PROTOCOL,PORT,ICMPCODE,ICMPTYPE
+
+exportobject_tocsv()
+exportservice_object_tocsv()
+extractgroupobject(txt)
+extractservicegroup(txt)
