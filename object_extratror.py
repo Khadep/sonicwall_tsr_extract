@@ -112,13 +112,13 @@ def extractserviceobject(txt):
 
 
 def extractservicegroup(txt):
-    # The following regex matches the network objects group section of the tsr
+    # The following regex matches the network service objects group section of the tsr
     a = re.search(
         r"(?s)--Service Group Table--(.*?)--Service Object Table--", txt)
     servicegroupstring = a.group(0)
     servicegroups = servicegroupstring.splitlines()
     servicegroupdict = {}
-    # The following function takes the object groups and puts them into a dictionary called objectgroup dict. The key is the object group name and the values are the group members
+    # The following function takes the object groups and puts them into a dictionary called servicegroupdict. The key is the object group name and the values are the group members
     for a in servicegroups:
         if '-------' in a and 'member' in (servicegroups[servicegroups.index(a)+3]):
             i = servicegroups.index(a)+3
