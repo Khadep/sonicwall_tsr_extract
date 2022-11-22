@@ -10,8 +10,8 @@ def extractobject(txt):
         r"(?s)--Address Object Table--(.*)Network Object Manager", txt)
     objectstring = x.group(0)
     objects = objectstring.splitlines()
-    objectdict = {}
-
+    #objectdict = {}
+    objectlist = []
     # The following function takes the objects and puts them into a dictionary called objectdict the key is the object name and the value is the ip info
     for x in objects:
         if '------' and '(' in x:
@@ -21,15 +21,20 @@ def extractobject(txt):
             pass
             #print('This is empty')
         elif '------' in x:
+            objectdict = {}
             objectitem = (objects[objects.index(x)+4])
             objectitems = objectitem.split(":")
             # the following regex matches on the name of the object.
             objectname1 = re.search(r"(?s)(?<=-------).*?(?=-------)", x)
             objectname = objectname1.group(0)
-            objectdict[objectname] = objectitems
+            objectdict['NAME'] = objectname
+            objectdict['TYPE'] = objectitems[0]
+            objectdict['VALUE'] = objectitems[1].strip()
+            # print(objectdict)
+            objectlist.append(objectdict)
         elif 'Network Object Manager' in x:
             break
-    print(objectdict)
+    print(objectlist)
 
 
 def extractgroupobject(txt):
@@ -112,7 +117,7 @@ def extractserviceobject(txt):
 
 
 def extractservicegroup(txt):
-    # The following regex matches the network service objects group section of the tsr
+    # The following regex matches the network  service objects group section of the tsr
     a = re.search(
         r"(?s)--Service Group Table--(.*?)--Service Object Table--", txt)
     servicegroupstring = a.group(0)
