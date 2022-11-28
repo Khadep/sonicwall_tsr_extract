@@ -1,5 +1,5 @@
 # sonicwall_tsr_extract
-we are using regular expressions to extract network objects, service objects, network object groups, and service object groups from a sonicwall firewall tsr file.
+we are using regular expressions to parse network objects, service objects, network object groups, and service object groups from a sonicwall firewall tsr file.
 
 example terminal usage 
 
