@@ -4,9 +4,9 @@ import re
 import csv
 import sys
 
-
 with open(sys.argv[1], 'r') as tsr_path:
     txt = tsr_path.read()
+
 
 def extractobject(txt):
     # The following regex matches the network objects section of the tsr
@@ -44,6 +44,7 @@ def extractobjectgroup(txt):
     objectgroupstring = y.group(0)
     objectgroups = objectgroupstring.splitlines()
     objectgroupdict = {}
+    extractgrouplist = []
     # The following function takes the object groups and puts them into a dictionary called objectgroup dict. The key is the object group name and the values are the group members
     try:
         for y in objectgroups:
@@ -63,12 +64,18 @@ def extractobjectgroup(txt):
                         ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')]
                     i += 1
                     if objectgroups[i] == '':
-                        objectgroupdict.update({objectgroupname.replace('(', '_').replace(
+                        extractgroupdict = {}
+                        objectgroupdict.update({objectgroupname.strip().replace('(', '_').replace(
                             ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_'): objectlist})
+                        extractgroupdict['NAME'] = objectgroupname.strip().replace('(', '_').replace(
+                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')
+                        extractgroupdict['Members'] = objectlist
+                        extractgrouplist.append(extractgroupdict)
                         break
     except IndexError:
         print(IndexError)
     print(objectgroupdict)
+    extractobjectgroup.var = extractgrouplist
 
 
 def extractserviceobject(txt):
@@ -100,6 +107,7 @@ def extractserviceobject(txt):
             icmptype = ""
             icmpcode = ""
             serviceobjectports = ""
+            print(serviceobjectstring)
             if 'IcmpType' in serviceobjectstring:
                 icmptype1 = re.search(
                     r"(?s)(?<=IcmpType: ).*?(?=I)", serviceobjectstring)
@@ -144,6 +152,8 @@ def extractserviceobject(txt):
             serviceobjectlist.append(serviceobjectdict)
         elif '--Route Advertisement--' in z:
             break
+    print(serviceobjectlist)
+    print(servicelist)
     extractserviceobject.list = servicelist
     extractserviceobject.var = serviceobjectlist
 
@@ -157,13 +167,13 @@ def extractservicegroup(txt):
     servicegroupstring = a.group(0)
     servicegroups = servicegroupstring.splitlines()
     servicegroupdict = {}
-    servicegrouplist = []
     extractservicegrouplist = []
     # The following function takes the object groups and puts them into a dictionary called servicegroupdict. The key is the object group name and the values are the group members
     for a in servicegroups:
         if '-------' in a and 'member' in (servicegroups[servicegroups.index(a)+3]):
             i = servicegroups.index(a)+3
-            # the following regexs matches on the name of the object.
+            # the following regex matches on the name of the object.
+            #objectgroupname1 = re.search(r"(?s)(?<=-------).*?(?=-------)", a)
             if a.count('(') > 1:
                 objectgroupname1 = re.search(
                     r"(?s)(?<=-------).*?(.*?\(){2}", a)
@@ -196,6 +206,8 @@ def extractservicegroup(txt):
                     extractservicegrouplist.append(extractservicegroupdict)
                     break
     extractservicegroup.var = extractservicegrouplist
+    print(extractservicegrouplist)
+    print("***")
     print(servicegroupdict)
 
 
@@ -210,6 +222,22 @@ def exportobject_tocsv():
                 csvfile, fieldnames=csv_columns, lineterminator='\n')
             writer.writeheader()
             for data in extractobject.var:
+                writer.writerow(data)
+    except IOError:
+        print("I/O error")
+
+
+def exportobject_groups_tocsv():
+    extractobjectgroup(txt)
+    # Here we are exporting the service objects to csv
+    csv_columns = ['NAME', 'Members']
+    csv_file = "sonicwallobjectgroups.csv"
+    try:
+        with open(csv_file, 'w') as csvfile:
+            writer = csv.DictWriter(
+                csvfile, fieldnames=csv_columns, lineterminator='\n')
+            writer.writeheader()
+            for data in extractobjectgroup.var:
                 writer.writerow(data)
     except IOError:
         print("I/O error")
@@ -248,6 +276,6 @@ def exportservice_groups_tocsv():
 
 
 exportobject_tocsv()
+exportobject_groups_tocsv()
 exportservice_object_tocsv()
-extractobjectgroup(txt)
 exportservice_groups_tocsv()
