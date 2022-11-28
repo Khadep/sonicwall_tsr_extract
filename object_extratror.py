@@ -1,8 +1,12 @@
+#!/usr/bin/python
+
 import re
+import csv
+import sys
 
-with open("C:/Users/lucidity/Downloads/techSupport_8FF542_11-16.wri") as v:
-    txt = v.read()
 
+with open(sys.argv[1], 'r') as tsr_path:
+    txt = tsr_path.read()
 
 def extractobject(txt):
     # The following regex matches the network objects section of the tsr
@@ -10,7 +14,6 @@ def extractobject(txt):
         r"(?s)--Address Object Table--(.*)Network Object Manager", txt)
     objectstring = x.group(0)
     objects = objectstring.splitlines()
-    #objectdict = {}
     objectlist = []
     # The following function takes the objects and puts them into a dictionary called objectdict the key is the object name and the value is the ip info
     for x in objects:
@@ -82,8 +85,6 @@ def extractserviceobject(txt):
             # the following regex matches on the service object ports.
             serviceobjectports1 = re.search(r"Ports:.*$", serviceobjectstring)
             # the following regex matches on the name of the object.
-            #serviceobjectname1 = re.search(r"(?s)(?<=-------).*?(?=-------)", z)
-            #print (serviceobjectname1)
             if z.count('(') > 1:
                 serviceobjectname1 = re.search(
                     r"(?s)(?<=-------).*?(.*?\(){2}", z)
@@ -93,15 +94,12 @@ def extractserviceobject(txt):
             else:
                 serviceobjectname1 = re.search(
                     r"(?s)(?<=-------).*?(?=-------)", z)
-            # print(serviceobjectname1)
             # the following regex matches on IP type which is based on a number.
             serviceobjecttype1 = re.search(
                 r"(?s)(?<=IpType: ).*?(?=,)", serviceobjectstring)
-            # print(serviceobjecttype1)
             icmptype = ""
             icmpcode = ""
             serviceobjectports = ""
-            print(serviceobjectstring)
             if 'IcmpType' in serviceobjectstring:
                 icmptype1 = re.search(
                     r"(?s)(?<=IcmpType: ).*?(?=I)", serviceobjectstring)
@@ -129,10 +127,6 @@ def extractserviceobject(txt):
                 serviceobjecttype = 'ICMP'
             elif serviceobjecttypenumber == '58':
                 serviceobjecttype = 'IPv6-ICMP'
-
-            #serviceobjectlist += [serviceobjecttype]
-            #serviceobjectlist += [serviceobjectconvert.strip()]
-            #serviceobjectdict[serviceobjectname] = [serviceobjectlist]
             # NAME,PROTOCOL,PORT,ICMPCODE,ICMPTYPE
             serviceobjectdict = {}
             # remove the following hash if you want to keep whitespaces, backslash, and parenthesis in the object name comment out the second "serviceobjectdict['NAME']" line
@@ -150,8 +144,6 @@ def extractserviceobject(txt):
             serviceobjectlist.append(serviceobjectdict)
         elif '--Route Advertisement--' in z:
             break
-    print(serviceobjectlist)
-    print(servicelist)
     extractserviceobject.list = servicelist
     extractserviceobject.var = serviceobjectlist
 
@@ -171,8 +163,7 @@ def extractservicegroup(txt):
     for a in servicegroups:
         if '-------' in a and 'member' in (servicegroups[servicegroups.index(a)+3]):
             i = servicegroups.index(a)+3
-            # the following regex matches on the name of the object.
-            #objectgroupname1 = re.search(r"(?s)(?<=-------).*?(?=-------)", a)
+            # the following regexs matches on the name of the object.
             if a.count('(') > 1:
                 objectgroupname1 = re.search(
                     r"(?s)(?<=-------).*?(.*?\(){2}", a)
@@ -205,8 +196,6 @@ def extractservicegroup(txt):
                     extractservicegrouplist.append(extractservicegroupdict)
                     break
     extractservicegroup.var = extractservicegrouplist
-    print(extractservicegrouplist)
-    print("***")
     print(servicegroupdict)
 
 
@@ -217,7 +206,8 @@ def exportobject_tocsv():
     csv_file = "sonicwallobjects.csv"
     try:
         with open(csv_file, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer = csv.DictWriter(
+                csvfile, fieldnames=csv_columns, lineterminator='\n')
             writer.writeheader()
             for data in extractobject.var:
                 writer.writerow(data)
@@ -232,7 +222,8 @@ def exportservice_object_tocsv():
     csv_file = "sonicwallserviceobjects.csv"
     try:
         with open(csv_file, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer = csv.DictWriter(
+                csvfile, fieldnames=csv_columns, lineterminator='\n')
             writer.writeheader()
             for data in extractserviceobject.var:
                 writer.writerow(data)
@@ -247,7 +238,8 @@ def exportservice_groups_tocsv():
     csv_file = "sonicwallservicegroups.csv"
     try:
         with open(csv_file, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer = csv.DictWriter(
+                csvfile, fieldnames=csv_columns, lineterminator='\n')
             writer.writeheader()
             for data in extractservicegroup.var:
                 writer.writerow(data)
