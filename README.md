@@ -3,7 +3,7 @@ takes a .mri tsr file from sonicwall and extracts network objects. The output is
 
 an example terminal usage  is 
 
-python object_extratror.py "filepath"
+python object_extractor.py "filepath"
 
 ie
 python object_extratror.py C:/Users/lucidity/Downloads/techSupport_8FF542_11-16.wri
