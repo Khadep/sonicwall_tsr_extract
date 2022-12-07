@@ -21,6 +21,22 @@ def extractobject(txt):
             objectdict = {}
             objectitem = (objects[objects.index(x)+4])
             objectitems = objectitem.split(":")
+            print(objectitem)
+            # the following regex matches on the name of the object.
+            objectname1 = re.search(r"(?s)(?<=-------).*?(?=-------)", x)
+            objectname = objectname1.group(0)
+            # remove the following hash if you want to keep whitespaces, backslash, and parenthesis in the object name comment out the second "objectdict['NAME']" line
+            #objectdict['NAME'] = objectname
+            objectdict['NAME'] = objectname.replace('(', '_').replace(')', '_').replace(
+                '/', '_').replace('\\', '_').replace(' ', '_')
+            objectdict['TYPE'] = objectitems[0]
+            objectdict['VALUE'] = objectitems[1].strip()
+            objectlist.append(objectdict)
+        elif '-------' in x:
+            objectdict = {}
+            objectitem = (objects[objects.index(x)+3])
+            objectitems = objectitem.split(":")
+            print(objectitem)
             # the following regex matches on the name of the object.
             objectname1 = re.search(r"(?s)(?<=-------).*?(?=-------)", x)
             objectname = objectname1.group(0)
@@ -33,6 +49,7 @@ def extractobject(txt):
             objectlist.append(objectdict)
         elif 'Network Object Manager' in x:
             break
+    print(objectlist)
     extractobject.var = objectlist
     return(objectlist)
 
@@ -50,6 +67,33 @@ def extractobjectgroup(txt):
         for y in objectgroups:
             if '-------' in y and 'Custom' in (objectgroups[objectgroups.index(y)+2]) and (objectgroups[objectgroups.index(y)+4]) != '':
                 i = objectgroups.index(y)+4
+                print(y)
+                # the following regex matches on the name of the object.
+                objectgroupname1 = re.search(
+                    r"(?s)(?<=-------).*?(?=-------)", y)
+                objectgroupname = objectgroupname1.group(0)
+                objectlist = []
+                # the following appends members of the group to a list that is added as a value to the dictionary.
+                while i > 0:
+                    objectmember1 = re.search(
+                        r"(?s)(?<=Name:).*?(?=Handle:)", objectgroups[i])
+                    objectmember = objectmember1.group(0)
+                    objectlist += [objectmember.strip().replace('(', '_').replace(
+                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')]
+                    i += 1
+                    if objectgroups[i] == '':
+                        extractgroupdict = {}
+                        objectgroupdict.update({objectgroupname.strip().replace('(', '_').replace(
+                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_'): objectlist})
+                        extractgroupdict['NAME'] = objectgroupname.strip().replace('(', '_').replace(
+                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')
+                        extractgroupdict['Members'] = objectlist
+                        extractgrouplist.append(extractgroupdict)
+                        break
+            elif '-------' in y and "member" in (objectgroups[objectgroups.index(y)+3]):
+                i = objectgroups.index(y)+3
+                print(y)
+                print(i)
                 # the following regex matches on the name of the object.
                 objectgroupname1 = re.search(
                     r"(?s)(?<=-------).*?(?=-------)", y)
