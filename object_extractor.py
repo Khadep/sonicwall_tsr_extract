@@ -28,7 +28,7 @@ def extractobject(txt):
             # remove the following hash if you want to keep whitespaces, backslash, and parenthesis in the object name comment out the second "objectdict['NAME']" line
             #objectdict['NAME'] = objectname
             objectdict['NAME'] = objectname.replace('(', '_').replace(')', '_').replace(
-                '/', '_').replace('\\', '_').replace(' ', '_')
+                '/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_')
             objectdict['TYPE'] = objectitems[0]
             objectdict['VALUE'] = objectitems[1].strip()
             objectlist.append(objectdict)
@@ -43,7 +43,7 @@ def extractobject(txt):
             # remove the following hash if you want to keep whitespaces, backslash, and parenthesis in the object name comment out the second "objectdict['NAME']" line
             #objectdict['NAME'] = objectname
             objectdict['NAME'] = objectname.replace('(', '_').replace(')', '_').replace(
-                '/', '_').replace('\\', '_').replace(' ', '_')
+                '/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_')
             objectdict['TYPE'] = objectitems[0]
             objectdict['VALUE'] = objectitems[1].strip()
             objectlist.append(objectdict)
@@ -79,14 +79,14 @@ def extractobjectgroup(txt):
                         r"(?s)(?<=Name:).*?(?=Handle:)", objectgroups[i])
                     objectmember = objectmember1.group(0)
                     objectlist += [objectmember.strip().replace('(', '_').replace(
-                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')]
+                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_')]
                     i += 1
                     if objectgroups[i] == '':
                         extractgroupdict = {}
                         objectgroupdict.update({objectgroupname.strip().replace('(', '_').replace(
-                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_'): objectlist})
+                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_'): objectlist})
                         extractgroupdict['NAME'] = objectgroupname.strip().replace('(', '_').replace(
-                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')
+                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_')
                         extractgroupdict['Members'] = objectlist
                         extractgrouplist.append(extractgroupdict)
                         break
@@ -105,14 +105,14 @@ def extractobjectgroup(txt):
                         r"(?s)(?<=Name:).*?(?=Handle:)", objectgroups[i])
                     objectmember = objectmember1.group(0)
                     objectlist += [objectmember.strip().replace('(', '_').replace(
-                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')]
+                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_')]
                     i += 1
                     if objectgroups[i] == '':
                         extractgroupdict = {}
                         objectgroupdict.update({objectgroupname.strip().replace('(', '_').replace(
-                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_'): objectlist})
+                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_'): objectlist})
                         extractgroupdict['NAME'] = objectgroupname.strip().replace('(', '_').replace(
-                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')
+                            ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_')
                         extractgroupdict['Members'] = objectlist
                         extractgrouplist.append(extractgroupdict)
                         break
@@ -178,15 +178,15 @@ def extractserviceobject(txt):
             elif serviceobjecttypenumber == '1':
                 serviceobjecttype = 'ICMP'
             elif serviceobjecttypenumber == '58':
-                serviceobjecttype = 'IPv6-ICMP'
+                serviceobjecttype = 'ICMP6'
             # NAME,PROTOCOL,PORT,ICMPCODE,ICMPTYPE
             serviceobjectdict = {}
             # remove the following hash if you want to keep whitespaces, backslash, and parenthesis in the object name comment out the second "serviceobjectdict['NAME']" line
             #serviceobjectdict['NAME'] = serviceobjectname
             serviceobjectdict['NAME'] = serviceobjectname.strip().replace('(', '_').replace(
-                ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')
+                ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_')
             servicelist += [serviceobjectname.replace('(', '_').replace(')', '_').replace(
-                '/', '_').replace('\\', '_').replace(' ', '_')]
+                '/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_')]
             serviceobjectdict['PROTOCOL'] = serviceobjecttype
             if icmpcode != "":
                 serviceobjectdict['ICMPCODE'] = icmpcode
@@ -234,18 +234,18 @@ def extractservicegroup(txt):
                     r"(?s)(?<=Name:).*?(?=Handle:)", servicegroups[i])
                 objectmember = objectmember1.group(0)
                 if objectmember.strip().replace('(', '_').replace(
-                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_') not in extractserviceobject.list:
+                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_') not in extractserviceobject.list:
                     print(objectmember + " member is not custom")
                 objectlist += [objectmember.strip().replace('(', '_').replace(
-                    ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')]
+                    ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_')]
 
                 i += 1
                 if servicegroups[i] == '':
                     extractservicegroupdict = {}
                     servicegroupdict.update({objectgroupname.strip().replace('(', '_').replace(
-                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_'): objectlist})
+                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_'): objectlist})
                     extractservicegroupdict['NAME'] = objectgroupname.strip().replace('(', '_').replace(
-                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_')
+                        ')', '_').replace('/', '_').replace('\\', '_').replace(' ', '_').replace('*', '_').replace(',', '_').replace('+', '_').replace('"', '_')
                     extractservicegroupdict['Members'] = objectlist
                     extractservicegrouplist.append(extractservicegroupdict)
                     break
